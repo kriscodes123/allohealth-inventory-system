@@ -25,6 +25,7 @@ export default function Home() {
 
   const [expiryTime, setExpiryTime] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
+  const [reservationId, setReservationId] = useState<number | null>(null);
 
   // Fetch products initially
   useEffect(() => {
@@ -107,6 +108,7 @@ export default function Home() {
       setMessage("Reservation created successfully!");
 
       setExpiryTime(data.expiresAt);
+      setReservationId(data.id);
 
       fetchProducts();
     } catch (error) {
@@ -115,6 +117,74 @@ export default function Home() {
       setMessage("Reservation failed");
     }
   }
+
+  async function confirmReservation() {
+  if (!reservationId) return;
+
+  try {
+    const response = await fetch(
+      `/api/reservations/${reservationId}/confirm`,
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.error || "Confirmation failed");
+      return;
+    }
+
+    setMessage("Purchase confirmed!");
+
+    setReservationId(null);
+
+    setTimeLeft("");
+
+    setExpiryTime("");
+
+    fetchProducts();
+  } catch (error) {
+    console.error(error);
+
+    setMessage("Confirmation failed");
+  }
+}
+
+async function cancelReservation() {
+  if (!reservationId) return;
+
+  try {
+    const response = await fetch(
+      `/api/reservations/${reservationId}/release`,
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.error || "Cancellation failed");
+      return;
+    }
+
+    setMessage("Reservation cancelled");
+
+    setReservationId(null);
+
+    setTimeLeft("");
+
+    setExpiryTime("");
+
+    fetchProducts();
+  } catch (error) {
+    console.error(error);
+
+    setMessage("Cancellation failed");
+  }
+}
 
   if (loading) {
     return (
@@ -143,6 +213,24 @@ export default function Home() {
           Reservation expires in: {timeLeft}
         </div>
       )}
+
+      {reservationId && (
+  <div className="mb-6 flex gap-4">
+    <button
+      onClick={confirmReservation}
+      className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+    >
+      Confirm Purchase
+    </button>
+
+    <button
+      onClick={cancelReservation}
+      className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+    >
+      Cancel Reservation
+    </button>
+  </div>
+)}
 
       <div className="grid gap-6 md:grid-cols-2">
         {products.map((product) => (
