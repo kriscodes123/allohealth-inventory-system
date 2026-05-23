@@ -18,7 +18,7 @@ export async function POST(
         },
       });
 
-      // Reservation missing
+      // Missing reservation
       if (!reservation) {
         return {
           error: "Reservation not found",
@@ -26,19 +26,11 @@ export async function POST(
         };
       }
 
-      // Already expired/released
+      // Only pending reservations can be released
       if (reservation.status !== "pending") {
         return {
-          error: "Reservation cannot be confirmed",
+          error: "Reservation cannot be released",
           status: 400,
-        };
-      }
-
-      // Expired reservation
-      if (new Date() > reservation.expiresAt) {
-        return {
-          error: "Reservation expired",
-          status: 410,
         };
       }
 
@@ -59,28 +51,25 @@ export async function POST(
         };
       }
 
-      // Permanently reduce stock
+      // Release reserved stock
       await tx.inventory.update({
         where: {
           id: inventory.id,
         },
         data: {
-          totalStock: {
-            decrement: reservation.quantity,
-          },
           reservedStock: {
             decrement: reservation.quantity,
           },
         },
       });
 
-      // Mark reservation confirmed
+      // Update reservation status
       const updatedReservation = await tx.reservation.update({
         where: {
           id: reservation.id,
         },
         data: {
-          status: "confirmed",
+          status: "released",
         },
       });
 
@@ -102,7 +91,7 @@ export async function POST(
     console.error(error);
 
     return NextResponse.json(
-      { error: "Confirmation failed" },
+      { error: "Release failed" },
       { status: 500 }
     );
   }
