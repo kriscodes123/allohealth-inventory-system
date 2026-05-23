@@ -6,13 +6,13 @@ A full-stack inventory reservation system built for the Allo Health engineering 
 
 # Live Demo
 
-(Add deployed Vercel URL here after deployment)
+https://allohealth-inventory-system-9nal9b48n.vercel.app/
 
 ---
 
 # GitHub Repository
 
-(Add GitHub repository URL here)
+https://github.com/kriscodes123/allohealth-inventory-system
 
 ---
 
