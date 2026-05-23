@@ -18,12 +18,13 @@ export async function GET() {
       name: product.name,
       description: product.description,
       inventories: product.inventories.map((inventory) => ({
-        warehouse: inventory.warehouse.name,
-        totalStock: inventory.totalStock,
-        reservedStock: inventory.reservedStock,
-        availableStock:
-          inventory.totalStock - inventory.reservedStock,
-      })),
+  warehouseId: inventory.warehouse.id,
+  warehouse: inventory.warehouse.name,
+  totalStock: inventory.totalStock,
+  reservedStock: inventory.reservedStock,
+  availableStock:
+    inventory.totalStock - inventory.reservedStock,
+})),
     }));
 
     return NextResponse.json(formattedProducts);

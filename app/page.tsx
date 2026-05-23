@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 interface Inventory {
+  warehouseId: number;
   warehouse: string;
   totalStock: number;
   reservedStock: number;
@@ -125,16 +126,23 @@ export default function Home() {
                     </p>
 
                     <button
-                      onClick={() =>
-                        reserveProduct(
-                          product.id,
-                          index + 1
-                        )
-                      }
-                      className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800"
-                    >
-                      Reserve 1 Item
-                    </button>
+  onClick={() =>
+    reserveProduct(
+      product.id,
+      inventory.warehouseId
+    )
+  }
+  disabled={inventory.availableStock <= 0}
+  className={`mt-3 rounded-lg px-4 py-2 text-white ${
+    inventory.availableStock <= 0
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-black hover:bg-gray-800"
+  }`}
+>
+  {inventory.availableStock <= 0
+    ? "Out of Stock"
+    : "Reserve 1 Item"}
+</button>
                   </div>
                 )
               )}
